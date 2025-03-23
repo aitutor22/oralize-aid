@@ -43,9 +43,6 @@ const TopicSelection: React.FC<TopicSelectionProps> = ({ onSelectTopic }) => {
             </div>
             <div className="p-5">
               <h3 className="text-xl font-semibold text-neutral-800">{topic.title}</h3>
-              <p className="text-neutral-500 mt-2 text-sm">
-                Practice oral skills related to {topic.title.toLowerCase()}
-              </p>
               <div className="mt-4 flex items-center justify-between">
                 <span className="text-blue-600 text-sm font-medium">3 question types</span>
                 <span className="inline-block w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
