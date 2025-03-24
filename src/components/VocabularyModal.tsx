@@ -42,29 +42,29 @@ const VocabularyModal: React.FC<VocabularyModalProps> = ({
           <TabsContent value="general" className="space-y-6">
             <div className="bg-blue-50 rounded-lg p-4">
               <h3 className="font-semibold text-blue-700 mb-3">Basic Vocabulary</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <VocabCard word="important" example="This is an important issue that affects many students." />
-                <VocabCard word="beneficial" example="Reading is beneficial for expanding your knowledge." />
-                <VocabCard word="significant" example="There is a significant difference between the two approaches." />
-                <VocabCard word="consider" example="We should consider all options before making a decision." />
-                <VocabCard word="furthermore" example="The activity is fun; furthermore, it helps build teamwork." />
-                <VocabCard word="therefore" example="He studied hard; therefore, he performed well on the test." />
-                <VocabCard word="consequently" example="He didn't practice; consequently, he didn't improve." />
-                <VocabCard word="evidently" example="Evidently, more practice leads to better results." />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <VocabPill word="important" />
+                <VocabPill word="beneficial" />
+                <VocabPill word="significant" />
+                <VocabPill word="consider" />
+                <VocabPill word="furthermore" />
+                <VocabPill word="therefore" />
+                <VocabPill word="consequently" />
+                <VocabPill word="evidently" />
               </div>
             </div>
             
             <div className="bg-blue-50 rounded-lg p-4">
               <h3 className="font-semibold text-blue-700 mb-3">Intermediate Vocabulary</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <VocabCard word="substantial" example="There is substantial evidence supporting this view." />
-                <VocabCard word="imperative" example="It is imperative that we address this issue immediately." />
-                <VocabCard word="versatile" example="Reading is a versatile skill that helps in many subjects." />
-                <VocabCard word="meticulous" example="She was meticulous in her preparation for the exam." />
-                <VocabCard word="facilitate" example="Good communication can facilitate better understanding." />
-                <VocabCard word="nevertheless" example="It was difficult; nevertheless, they persevered." />
-                <VocabCard word="subsequently" example="He made a mistake and subsequently corrected it." />
-                <VocabCard word="analogous" example="This situation is analogous to what happened last year." />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <VocabPill word="substantial" />
+                <VocabPill word="imperative" />
+                <VocabPill word="versatile" />
+                <VocabPill word="meticulous" />
+                <VocabPill word="facilitate" />
+                <VocabPill word="nevertheless" />
+                <VocabPill word="subsequently" />
+                <VocabPill word="analogous" />
               </div>
             </div>
           </TabsContent>
@@ -126,10 +126,9 @@ const VocabularyModal: React.FC<VocabularyModalProps> = ({
   );
 };
 
-const VocabCard = ({ word, example }: { word: string; example: string }) => (
-  <div className="bg-white p-3 rounded border border-blue-200">
-    <div className="font-medium text-blue-700">{word}</div>
-    <div className="text-sm text-neutral-600 mt-1">{example}</div>
+const VocabPill = ({ word }: { word: string }) => (
+  <div className="bg-white py-2 px-3 rounded-full border border-blue-200 text-center">
+    <span className="font-medium text-blue-700">{word}</span>
   </div>
 );
 
@@ -143,3 +142,4 @@ const QuoteCard = ({ quote, usage }: { quote: string; usage: string }) => (
 );
 
 export default VocabularyModal;
+
