@@ -23,7 +23,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
   
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-12 animate-fade-in">
+    <div className="w-full max-w-6xl mx-auto px-4 py-12 animate-fade-in">
       <div className="text-center mb-12">
         <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">
           Feedback
@@ -31,7 +31,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
         <h1 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">
           Your Answer Feedback
         </h1>
-        <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+        <p className="text-lg text-neutral-600 max-w-3xl mx-auto">
           Review the feedback below to improve your oral skills. You can try again or move on to another question.
         </p>
       </div>
@@ -50,7 +50,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-blue-700 mb-2">Your Original Answer</h3>
                 <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-200 text-neutral-700 min-h-[200px]">
-                  {feedback.userAnswer || "No transcription available."}
+                  {feedback.originalAnswer || "No transcription available."}
                 </div>
               </div>
               
@@ -110,7 +110,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-blue-700 mb-2">Your Original Answer</h3>
                 <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-200 text-neutral-700 min-h-[200px]">
-                  {feedback.userAnswer || "No transcription available."}
+                  {feedback.originalAnswer || "No transcription available."}
                 </div>
               </div>
               
@@ -188,7 +188,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-blue-700 mb-2">Your Original Answer</h3>
                 <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-200 text-neutral-700 min-h-[200px]">
-                  {feedback.userAnswer || "No transcription available."}
+                  {feedback.originalAnswer || "No transcription available."}
                 </div>
               </div>
               
