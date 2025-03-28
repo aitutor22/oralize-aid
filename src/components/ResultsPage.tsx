@@ -183,19 +183,27 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
         
         <TabsContent value="revised" className="mt-0">
           <Card className="border border-neutral-200 card-shadow p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* User's original answer - Left side */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-blue-700 mb-2">Your Original Answer</h3>
-                <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-200 text-neutral-700 min-h-[200px]">
+            <div className="space-y-6">
+              {/* User's original answer */}
+              <div className="space-y-3">
+                <h3 className="text-lg font-medium text-blue-700">Your Original Answer</h3>
+                <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-200 text-neutral-700">
                   {feedback.originalAnswer || "No transcription available."}
                 </div>
               </div>
               
-              {/* Revised answer - Right side */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-blue-700 mb-2">Improved Answer</h3>
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-neutral-800 min-h-[200px]">
+              {/* Commentary on improved answer */}
+              <div className="space-y-3 mt-8">
+                <h3 className="text-lg font-medium text-blue-700">Improvement Commentary</h3>
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-neutral-700">
+                  <p>This revised answer demonstrates better structure using the PEEL format, includes more advanced vocabulary, and provides clearer examples to support your point. The conclusion is also stronger and links back to the main idea effectively.</p>
+                </div>
+              </div>
+              
+              {/* Revised answer */}
+              <div className="space-y-3 mt-8">
+                <h3 className="text-lg font-medium text-blue-700">Improved Answer</h3>
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-neutral-800">
                   {feedback.revisedAnswer}
                 </div>
                 
