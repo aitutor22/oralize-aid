@@ -44,45 +44,59 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
         </TabsList>
         
         <TabsContent value="peel" className="mt-0">
-          <Card className="border border-neutral-200 card-shadow p-6 space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-3 text-blue-700 font-semibold flex-shrink-0 mt-1">
-                  P
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium text-blue-700 mb-2">Point</h3>
-                  <p className="text-neutral-700">{feedback.peel.point}</p>
+          <Card className="border border-neutral-200 card-shadow p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* User's original answer - Left side */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-blue-700 mb-2">Your Original Answer</h3>
+                <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-200 text-neutral-700 min-h-[200px]">
+                  {feedback.userAnswer || "No transcription available."}
                 </div>
               </div>
               
-              <div className="flex items-start">
-                <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-3 text-blue-700 font-semibold flex-shrink-0 mt-1">
-                  E
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium text-blue-700 mb-2">Explanation</h3>
-                  <p className="text-neutral-700">{feedback.peel.explanation}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start">
-                <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-3 text-blue-700 font-semibold flex-shrink-0 mt-1">
-                  E
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium text-blue-700 mb-2">Example</h3>
-                  <p className="text-neutral-700">{feedback.peel.example}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start">
-                <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-3 text-blue-700 font-semibold flex-shrink-0 mt-1">
-                  L
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium text-blue-700 mb-2">Link</h3>
-                  <p className="text-neutral-700">{feedback.peel.link}</p>
+              {/* PEEL feedback - Right side */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-blue-700 mb-2">PEEL Structure Feedback</h3>
+                <div className="space-y-4">
+                  <div className="flex items-start">
+                    <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-3 text-blue-700 font-semibold flex-shrink-0">
+                      P
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-blue-700 mb-1">Point</h4>
+                      <p className="text-neutral-700 text-sm">{feedback.peel.point}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-3 text-blue-700 font-semibold flex-shrink-0">
+                      E
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-blue-700 mb-1">Explanation</h4>
+                      <p className="text-neutral-700 text-sm">{feedback.peel.explanation}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-3 text-blue-700 font-semibold flex-shrink-0">
+                      E
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-blue-700 mb-1">Example</h4>
+                      <p className="text-neutral-700 text-sm">{feedback.peel.example}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center mr-3 text-blue-700 font-semibold flex-shrink-0">
+                      L
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-blue-700 mb-1">Link</h4>
+                      <p className="text-neutral-700 text-sm">{feedback.peel.link}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -90,86 +104,109 @@ const ResultsPage: React.FC<ResultsPageProps> = ({
         </TabsContent>
         
         <TabsContent value="language" className="mt-0">
-          <Card className="border border-neutral-200 card-shadow p-6 space-y-6">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium text-blue-700 mb-3 pb-2 border-b border-neutral-200">
-                  Vocabulary
-                </h3>
-                <ul className="space-y-2">
-                  {feedback.language.vocabulary.map((item, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      <span className="text-neutral-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium text-blue-700 mb-3 pb-2 border-b border-neutral-200">
-                  Grammar
-                </h3>
-                <ul className="space-y-2">
-                  {feedback.language.grammar.map((item, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      <span className="text-neutral-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium text-blue-700 mb-3 pb-2 border-b border-neutral-200">
-                  Sentence Structure
-                </h3>
-                <ul className="space-y-2">
-                  {feedback.language.sentenceStructure.map((item, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      <span className="text-neutral-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              {feedback.language.pronunciation && (
-                <div>
-                  <h3 className="text-lg font-medium text-blue-700 mb-3 pb-2 border-b border-neutral-200">
-                    Pronunciation
-                  </h3>
-                  <ul className="space-y-2">
-                    {feedback.language.pronunciation.map((item, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="text-blue-500 mr-2">•</span>
-                        <span className="text-neutral-700">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+          <Card className="border border-neutral-200 card-shadow p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* User's original answer - Left side */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-blue-700 mb-2">Your Original Answer</h3>
+                <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-200 text-neutral-700 min-h-[200px]">
+                  {feedback.userAnswer || "No transcription available."}
                 </div>
-              )}
+              </div>
+              
+              {/* Language feedback - Right side */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-blue-700 mb-2">Language Usage Feedback</h3>
+                <div className="space-y-6 overflow-y-auto max-h-[500px] pr-2">
+                  <div>
+                    <h4 className="font-medium text-blue-700 mb-2 pb-1 border-b border-neutral-200">
+                      Vocabulary
+                    </h4>
+                    <ul className="space-y-1">
+                      {feedback.language.vocabulary.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="text-blue-500 mr-2">•</span>
+                          <span className="text-neutral-700 text-sm">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-blue-700 mb-2 pb-1 border-b border-neutral-200">
+                      Grammar
+                    </h4>
+                    <ul className="space-y-1">
+                      {feedback.language.grammar.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="text-blue-500 mr-2">•</span>
+                          <span className="text-neutral-700 text-sm">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-blue-700 mb-2 pb-1 border-b border-neutral-200">
+                      Sentence Structure
+                    </h4>
+                    <ul className="space-y-1">
+                      {feedback.language.sentenceStructure.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="text-blue-500 mr-2">•</span>
+                          <span className="text-neutral-700 text-sm">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  {feedback.language.pronunciation && (
+                    <div>
+                      <h4 className="font-medium text-blue-700 mb-2 pb-1 border-b border-neutral-200">
+                        Pronunciation
+                      </h4>
+                      <ul className="space-y-1">
+                        {feedback.language.pronunciation.map((item, index) => (
+                          <li key={index} className="flex items-start">
+                            <span className="text-blue-500 mr-2">•</span>
+                            <span className="text-neutral-700 text-sm">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </Card>
         </TabsContent>
         
         <TabsContent value="revised" className="mt-0">
           <Card className="border border-neutral-200 card-shadow p-6">
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-blue-700 mb-3">
-                Improved Answer
-              </h3>
-              <div className="bg-blue-50 p-5 rounded-lg border border-blue-100 text-neutral-800 leading-relaxed">
-                {feedback.revisedAnswer}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* User's original answer - Left side */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-blue-700 mb-2">Your Original Answer</h3>
+                <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-200 text-neutral-700 min-h-[200px]">
+                  {feedback.userAnswer || "No transcription available."}
+                </div>
+              </div>
+              
+              {/* Revised answer - Right side */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-blue-700 mb-2">Improved Answer</h3>
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-neutral-800 min-h-[200px]">
+                  {feedback.revisedAnswer}
+                </div>
+                
+                <Button 
+                  onClick={() => setIsRevisionModalOpen(true)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
+                >
+                  Practice Reading This Answer
+                </Button>
               </div>
             </div>
-            
-            <Button 
-              onClick={() => setIsRevisionModalOpen(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700"
-            >
-              Practice Reading This Answer
-            </Button>
           </Card>
         </TabsContent>
       </Tabs>
