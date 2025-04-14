@@ -240,15 +240,16 @@ export const getMockAnswer = (questionId: number): PeelResponse => {
       explanation: "In today's digital world, meaningful connection is often hindered by constant notifications and screen time that fragment our attention and prevent deep conversations.",
       example: "For example, designating one evening per week for a family dinner where all devices are put away, followed by a shared activity like board games or cooking together, creates space for genuine interaction.",
       link: "These intentional rituals not only strengthen family bonds but also teach children valuable skills in relationship-building and present-moment awareness that benefit their social development."
-    },
-    // Default mock answer for any other question
-    default: {
-      point: "Yes, I believe doing household chores is important.",
-      explanation: "In view of the recent COVID-19 pandemic, it is ever more crucial to maintain a high standard of cleanliness and I believe that personal hygiene starts from our homes. Chores also help to teach us valuable life skills. Besides that, helping my parents to start off with the household chores is a gracious gesture of love I can show them as they usually come home late in the evening, exhausted from work and long hours of travelling.",
-      example: "My parents are pleasantly surprised to come home to a clean and sweet-smelling environment as it is very welcoming to them and their mood is instantly uplifted. I love to see their smiling countenances as it is so rewarding for me. We are very hygiene conscious and feel proud to keep our home spick and span. Cleaning every nook and cranny of our homes will allow us to keep our homes looking presentable and pristine and appear inviting to guests. We learn personal responsibility by keeping our home clean and inviting. Doing household chores imbue us with life-skills like ironing and laundry that would prove valuable when I grow up into an adult and complete my own chores independently.",
-      link: "These are the reasons why I believe doing chores is important."
     }
   };
 
-  return mockAnswers[questionId] || mockAnswers.default;
+  // Add default case for any other question
+  const defaultAnswer: PeelResponse = {
+    point: "Yes, I believe doing household chores is important.",
+    explanation: "In view of the recent COVID-19 pandemic, it is ever more crucial to maintain a high standard of cleanliness and I believe that personal hygiene starts from our homes. Chores also help to teach us valuable life skills. Besides that, helping my parents to start off with the household chores is a gracious gesture of love I can show them as they usually come home late in the evening, exhausted from work and long hours of travelling.",
+    example: "My parents are pleasantly surprised to come home to a clean and sweet-smelling environment as it is very welcoming to them and their mood is instantly uplifted. I love to see their smiling countenances as it is so rewarding for me. We are very hygiene conscious and feel proud to keep our home spick and span. Cleaning every nook and cranny of our homes will allow us to keep our homes looking presentable and pristine and appear inviting to guests. We learn personal responsibility by keeping our home clean and inviting. Doing household chores imbue us with life-skills like ironing and laundry that would prove valuable when I grow up into an adult and complete my own chores independently.",
+    link: "These are the reasons why I believe doing chores is important."
+  };
+
+  return mockAnswers[questionId] || defaultAnswer;
 };
