@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -102,46 +101,42 @@ const QuestionSelection: React.FC<QuestionSelectionProps> = ({
             )}
             onClick={() => onSelectQuestion(question.id)}
           >
-            <div className="p-6 flex flex-col md:flex-row md:items-center gap-4">
-              <div className="md:w-1/4">
-                <div className="rounded-lg bg-blue-100 text-blue-700 font-medium py-2 px-4 inline-block text-sm">
+            <div className="p-6 flex flex-col gap-4">
+              <div className="flex flex-col">
+                <div className="rounded-lg bg-blue-100 text-blue-700 font-medium py-2 px-4 inline-block text-sm mb-2">
                   {questionTypeLabels[question.type as keyof typeof questionTypeLabels]}
                 </div>
-              </div>
-              
-              <div className="md:w-1/2">
-                <h3 className="text-xl font-semibold text-neutral-800 mb-2">
+                
+                <h3 className="text-xl font-semibold text-neutral-800 mb-4">
                   {question.text}
                 </h3>
-                {question.type === 1 && (
-                  <p className="text-neutral-500 text-sm">
-                    This question includes an image for reference
-                  </p>
-                )}
-              </div>
 
-              <div className="md:w-1/4 flex justify-end gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                  onClick={(e) => handleShowMockAnswer(e, question.id)}
-                >
-                  <FileText className="mr-1 h-4 w-4" />
-                  See Example
-                </Button>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="bg-blue-600 hover:bg-blue-700"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectQuestion(question.id);
-                  }}
-                >
-                  Practice
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
+                <div className="flex gap-2 mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShowMockAnswer(e, question.id);
+                    }}
+                  >
+                    <FileText className="mr-1 h-4 w-4" />
+                    See Example
+                  </Button>
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="bg-blue-600 hover:bg-blue-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectQuestion(question.id);
+                    }}
+                  >
+                    Practice
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </Card>
