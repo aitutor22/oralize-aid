@@ -19,7 +19,6 @@ const ReviseAnswer = () => {
   };
   
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const {
     isRecording,
     recordingTime,
@@ -39,8 +38,6 @@ const ReviseAnswer = () => {
   };
 
   const speakMockAnswer = async () => {
-    // This would connect to a TTS API in a real implementation
-    // For now, we'll just toggle the state and show a toast notification
     setIsPlaying(true);
     toast({
       title: "Text-to-Speech",
@@ -48,7 +45,6 @@ const ReviseAnswer = () => {
       duration: 3000,
     });
     
-    // Simulate audio playing duration
     setTimeout(() => {
       setIsPlaying(false);
     }, 5000);
@@ -91,141 +87,115 @@ const ReviseAnswer = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {question.imageSrc && (
-                <div className="md:col-span-1">
-                  <img 
-                    src={question.imageSrc} 
-                    alt="Question visual aid" 
-                    className="w-full rounded-md shadow-sm"
-                  />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Answer Content (Left Side) */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium text-blue-600 mb-2">Point</h3>
+                  <p className="border-l-4 border-blue-200 pl-3">{mockAnswer.point}</p>
                 </div>
-              )}
-              
-              <div className={question.imageSrc ? "md:col-span-2" : "md:col-span-3"}>
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold">Model Answer</h2>
-                  <Button 
-                    onClick={speakMockAnswer} 
-                    disabled={isPlaying}
-                    variant="outline"
-                  >
-                    {isPlaying ? (
-                      <>
-                        <Volume2 className="mr-2 h-4 w-4 animate-pulse" />
-                        Playing...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="mr-2 h-4 w-4" />
-                        Listen
-                      </>
-                    )}
-                  </Button>
+                
+                <div>
+                  <h3 className="font-medium text-green-600 mb-2">Explanation</h3>
+                  <p className="border-l-4 border-green-200 pl-3">{mockAnswer.explanation}</p>
                 </div>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-medium text-blue-600">Point</h3>
-                    <p className="mt-1 border-l-4 border-blue-200 pl-3">{mockAnswer.point}</p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium text-green-600">Explanation</h3>
-                    <p className="mt-1 border-l-4 border-green-200 pl-3">{mockAnswer.explanation}</p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium text-orange-600">Example</h3>
-                    <p className="mt-1 border-l-4 border-orange-200 pl-3">{mockAnswer.example}</p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium text-purple-600">Link</h3>
-                    <p className="mt-1 border-l-4 border-purple-200 pl-3">{mockAnswer.link}</p>
-                  </div>
+                
+                <div>
+                  <h3 className="font-medium text-orange-600 mb-2">Example</h3>
+                  <p className="border-l-4 border-orange-200 pl-3">{mockAnswer.example}</p>
+                </div>
+                
+                <div>
+                  <h3 className="font-medium text-purple-600 mb-2">Link</h3>
+                  <p className="border-l-4 border-purple-200 pl-3">{mockAnswer.link}</p>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Practice Speaking</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-gray-500">
-                Practice speaking this answer to improve your pronunciation and fluency.
-              </p>
-              
-              <div className="flex flex-col items-center py-6">
-                <div className="sound-wave-container mb-4 h-16 flex items-center justify-center">
-                  {isRecording ? (
-                    [...Array(5)].map((_, i) => (
-                      <div key={i} className="sound-wave-bar h-10 w-1 bg-blue-500 mx-1 animate-sound-wave"></div>
-                    ))
-                  ) : (
-                    <div className="text-center text-gray-400">
-                      {!audioUrl && "Tap the microphone to start recording"}
-                      {audioUrl && "Recording complete"}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="text-center mb-4">
-                  <div className="text-2xl font-mono">{formattedTime}</div>
-                </div>
-                
-                <div className="flex gap-3">
-                  {!isRecording && !audioUrl && (
-                    <Button 
-                      onClick={startRecording} 
-                      variant="outline" 
-                      size="lg" 
-                      className="rounded-full w-16 h-16 bg-red-50 hover:bg-red-100"
-                    >
-                      <Mic className="h-6 w-6 text-red-500" />
-                    </Button>
-                  )}
-                  
-                  {isRecording && (
-                    <Button 
-                      onClick={stopRecording} 
-                      variant="outline" 
-                      size="lg" 
-                      className="rounded-full w-16 h-16 bg-red-100 hover:bg-red-200 animate-pulse"
-                    >
-                      <MicOff className="h-6 w-6 text-red-500" />
-                    </Button>
-                  )}
-                  
-                  {audioUrl && (
+
+              {/* Speaking Practice (Right Side) */}
+              <div className="flex flex-col items-center justify-start space-y-4">
+                <Button 
+                  onClick={speakMockAnswer} 
+                  disabled={isPlaying}
+                  className="w-full"
+                >
+                  {isPlaying ? (
                     <>
-                      <audio src={audioUrl} controls className="w-full max-w-md" />
-                      <Button 
-                        onClick={resetRecording} 
-                        variant="outline"
-                      >
-                        Record Again
-                      </Button>
-                      <Button 
-                        onClick={processRecording}
-                        disabled={isProcessing}
-                      >
-                        {isProcessing ? "Processing..." : "Submit Recording"}
-                      </Button>
+                      <Volume2 className="mr-2 h-4 w-4 animate-pulse" />
+                      Playing...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="mr-2 h-4 w-4" />
+                      Listen to Answer
                     </>
                   )}
+                </Button>
+
+                <div className="w-full space-y-4 py-6">
+                  <div className="sound-wave-container mb-4 h-16 flex items-center justify-center">
+                    {isRecording ? (
+                      [...Array(5)].map((_, i) => (
+                        <div key={i} className="sound-wave-bar h-10 w-1 bg-blue-500 mx-1 animate-sound-wave"></div>
+                      ))
+                    ) : (
+                      <div className="text-center text-gray-400">
+                        {!audioUrl && "Tap the microphone to start recording"}
+                        {audioUrl && "Recording complete"}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="text-center mb-4">
+                    <div className="text-2xl font-mono">{formattedTime}</div>
+                  </div>
+                  
+                  <div className="flex gap-3 w-full justify-center">
+                    {!isRecording && !audioUrl && (
+                      <Button 
+                        onClick={startRecording} 
+                        variant="outline" 
+                        size="lg" 
+                        className="rounded-full w-16 h-16 bg-red-50 hover:bg-red-100"
+                      >
+                        <Mic className="h-6 w-6 text-red-500" />
+                      </Button>
+                    )}
+                    
+                    {isRecording && (
+                      <Button 
+                        onClick={stopRecording} 
+                        variant="outline" 
+                        size="lg" 
+                        className="rounded-full w-16 h-16 bg-red-100 hover:bg-red-200 animate-pulse"
+                      >
+                        <MicOff className="h-6 w-6 text-red-500" />
+                      </Button>
+                    )}
+                    
+                    {audioUrl && (
+                      <div className="flex flex-col gap-3 w-full">
+                        <audio src={audioUrl} controls className="w-full" />
+                        <div className="flex gap-3">
+                          <Button 
+                            onClick={resetRecording} 
+                            variant="outline"
+                            className="flex-1"
+                          >
+                            Record Again
+                          </Button>
+                          <Button 
+                            onClick={processRecording}
+                            disabled={isProcessing}
+                            className="flex-1"
+                          >
+                            {isProcessing ? "Processing..." : "Submit Recording"}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-              
-              {transcription && (
-                <div className="mt-6 p-4 bg-gray-50 rounded-md">
-                  <h3 className="font-medium mb-2">Your Recorded Answer</h3>
-                  <p>{transcription}</p>
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>
