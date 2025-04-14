@@ -21,6 +21,7 @@ export interface PeelResponse {
 }
 
 export interface Feedback {
+  originalAnswer: string; // Added this property
   peel: {
     point: string;
     explanation: string;
@@ -154,7 +155,11 @@ export const peelExplanation = {
 
 // Mock feedback generator
 export const generateMockFeedback = (response: PeelResponse, isAudio: boolean): Feedback => {
+  // Create a mock original answer from the response
+  const originalAnswer = `I ${response.point.length > 0 ? response.point : "have an opinion about this"}. ${response.explanation.length > 0 ? response.explanation : "Let me explain my reasoning."} ${response.example.length > 0 ? response.example : "For instance, this is an example."} ${response.link.length > 0 ? response.link : "In conclusion, this is important."}`;
+
   return {
+    originalAnswer, // Add this property to the returned object
     peel: {
       point: response.point.length > 5 
         ? "Good effort in stating your main point. Try to make it even more concise and focused."
