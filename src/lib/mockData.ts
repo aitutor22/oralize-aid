@@ -1,4 +1,3 @@
-
 export interface Topic {
   id: number;
   title: string;
@@ -198,4 +197,58 @@ export const generateMockFeedback = (response: PeelResponse, isAudio: boolean): 
     },
     revisedAnswer: `I believe the students in the picture are feeling excited and proud because they are receiving recognition for their hard work at what appears to be a school award ceremony. For instance, the student in the center is holding a trophy with a beaming smile, while her classmates are applauding enthusiastically around her. These moments of recognition are significant as they not only boost students' confidence but also create lasting positive memories of their educational journey.`,
   };
+};
+
+// Add mock answers for each question (for the revise page)
+export const getMockAnswer = (questionId: number): PeelResponse => {
+  // Example mock answers for each question type
+  const mockAnswers: Record<number, PeelResponse> = {
+    // School Life questions
+    1: {
+      point: "The students in the picture appear excited and proud.",
+      explanation: "They are likely feeling this way because they have just received recognition for their academic achievements at what seems to be a school award ceremony.",
+      example: "For instance, several students are holding certificates and trophies, while their peers and teachers are clapping enthusiastically around them.",
+      link: "These moments of recognition are important as they motivate students to continue working hard and create lasting positive memories of their educational experience."
+    },
+    2: {
+      point: "I felt incredibly proud when I received the 'Most Improved Student' award in my mathematics class last year.",
+      explanation: "This achievement was particularly meaningful to me because I had struggled with mathematics for years and had dedicated countless hours to improving my skills through extra practice and tutoring sessions.",
+      example: "For example, I went from barely passing in the first term to scoring in the top 10% of the class by the final exam, which demonstrated my perseverance and growth mindset.",
+      link: "This experience taught me that with determination and the right support, I could overcome academic challenges that once seemed insurmountable, a lesson I've applied to other areas of my life."
+    },
+    3: {
+      point: "I believe schools could be more enjoyable by incorporating more interactive, real-world learning experiences into the curriculum.",
+      explanation: "Traditional classroom settings often focus too heavily on memorization and standardized testing, which can diminish students' natural curiosity and enthusiasm for learning.",
+      example: "For instance, replacing some theoretical lessons with hands-on projects, field trips, or community service initiatives would make learning more engaging and relevant.",
+      link: "These changes would not only make school more enjoyable but also better prepare students for future careers by developing crucial skills like creativity, collaboration, and problem-solving."
+    },
+    // Family & Friends questions
+    4: {
+      point: "The family in the picture appears to be celebrating a significant milestone together.",
+      explanation: "Their joyful expressions and the festive atmosphere suggest they are commemorating an important event that has brought them together from different generations.",
+      example: "For example, the presence of decorated tables, formal attire, and what looks like a special cake indicates this might be a wedding anniversary, graduation, or birthday celebration.",
+      link: "These family celebrations are crucial for maintaining bonds across generations and creating shared memories that strengthen family relationships for years to come."
+    },
+    5: {
+      point: "My best friend provided invaluable support when my family moved to a new city during my final year of school.",
+      explanation: "This was an especially challenging time as I was leaving behind familiar surroundings and friends while facing the pressure of important examinations.",
+      example: "For instance, she called me every week, sent encouraging messages before my exams, and even visited me twice despite the long distance, which helped me feel less isolated.",
+      link: "Her support taught me the importance of maintaining meaningful friendships even through major life changes and inspired me to be equally supportive to others facing difficult transitions."
+    },
+    6: {
+      point: "Families can create quality time by establishing regular technology-free rituals.",
+      explanation: "In today's digital world, meaningful connection is often hindered by constant notifications and screen time that fragment our attention and prevent deep conversations.",
+      example: "For example, designating one evening per week for a family dinner where all devices are put away, followed by a shared activity like board games or cooking together, creates space for genuine interaction.",
+      link: "These intentional rituals not only strengthen family bonds but also teach children valuable skills in relationship-building and present-moment awareness that benefit their social development."
+    },
+    // Default mock answer for any other question
+    default: {
+      point: "Yes, I believe doing household chores is important.",
+      explanation: "In view of the recent COVID-19 pandemic, it is ever more crucial to maintain a high standard of cleanliness and I believe that personal hygiene starts from our homes. Chores also help to teach us valuable life skills. Besides that, helping my parents to start off with the household chores is a gracious gesture of love I can show them as they usually come home late in the evening, exhausted from work and long hours of travelling.",
+      example: "My parents are pleasantly surprised to come home to a clean and sweet-smelling environment as it is very welcoming to them and their mood is instantly uplifted. I love to see their smiling countenances as it is so rewarding for me. We are very hygiene conscious and feel proud to keep our home spick and span. Cleaning every nook and cranny of our homes will allow us to keep our homes looking presentable and pristine and appear inviting to guests. We learn personal responsibility by keeping our home clean and inviting. Doing household chores imbue us with life-skills like ironing and laundry that would prove valuable when I grow up into an adult and complete my own chores independently.",
+      link: "These are the reasons why I believe doing chores is important."
+    }
+  };
+
+  return mockAnswers[questionId] || mockAnswers.default;
 };
