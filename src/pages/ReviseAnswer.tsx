@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -186,37 +185,50 @@ const ReviseAnswer = () => {
     return revisedContent;
   };
 
-  // Render view mode (displaying the entire PEEL structure)
   const renderViewMode = () => {
     return (
       <div className="space-y-6">
-        <Tabs defaultValue="point" className="w-full">
-          <TabsList className="grid grid-cols-4 mb-4">
-            {["point", "explanation", "example", "link"].map((section) => (
-              <TabsTrigger 
-                key={section} 
-                value={section}
-                className={`text-${getSectionColor(section as SectionType)}-600`}
-              >
-                {getSectionTitle(section as SectionType)}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          
-          {["point", "explanation", "example", "link"].map((section) => (
-            <TabsContent key={section} value={section} className="mt-0">
-              <div className={`border-l-4 border-${getSectionColor(section as SectionType)}-200 pl-4 py-3`}>
-                <h3 className={`font-medium text-${getSectionColor(section as SectionType)}-600 mb-2 flex items-center`}>
-                  <BookOpen className={`h-5 w-5 mr-2 text-${getSectionColor(section as SectionType)}-500`} />
-                  {getSectionTitle(section as SectionType)}
-                </h3>
-                <div className="text-lg leading-relaxed">
-                  {getSectionContent(section as SectionType)}
-                </div>
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className={`border-l-4 border-blue-200 pl-4 py-3`}>
+            <h3 className="font-medium text-blue-600 mb-2 flex items-center">
+              <BookOpen className="h-5 w-5 mr-2 text-blue-500" />
+              Point
+            </h3>
+            <div className="text-lg leading-relaxed">
+              {mockAnswer.point}
+            </div>
+          </div>
+
+          <div className={`border-l-4 border-green-200 pl-4 py-3`}>
+            <h3 className="font-medium text-green-600 mb-2 flex items-center">
+              <BookOpen className="h-5 w-5 mr-2 text-green-500" />
+              Explanation
+            </h3>
+            <div className="text-lg leading-relaxed">
+              {mockAnswer.explanation}
+            </div>
+          </div>
+
+          <div className={`border-l-4 border-orange-200 pl-4 py-3`}>
+            <h3 className="font-medium text-orange-600 mb-2 flex items-center">
+              <BookOpen className="h-5 w-5 mr-2 text-orange-500" />
+              Example
+            </h3>
+            <div className="text-lg leading-relaxed">
+              {mockAnswer.example}
+            </div>
+          </div>
+
+          <div className={`border-l-4 border-purple-200 pl-4 py-3`}>
+            <h3 className="font-medium text-purple-600 mb-2 flex items-center">
+              <BookOpen className="h-5 w-5 mr-2 text-purple-500" />
+              Link
+            </h3>
+            <div className="text-lg leading-relaxed">
+              {mockAnswer.link}
+            </div>
+          </div>
+        </div>
         
         <div className="flex justify-center mt-8">
           <Button 
@@ -231,7 +243,6 @@ const ReviseAnswer = () => {
     );
   };
 
-  // Render practice mode (section by section practice)
   const renderPracticeMode = () => {
     const isLastSection = currentSection === "link";
 
