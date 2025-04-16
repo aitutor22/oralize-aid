@@ -8,8 +8,10 @@ import { Mic, MicOff, Play, ArrowLeft, ArrowRight, BookOpen } from "lucide-react
 import { PeelResponse, Question } from "@/lib/mockData";
 import { processAudioTranscription } from "@/lib/feedback";
 import { useToast } from "@/hooks/use-toast";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, 
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import RevisionModal from "@/components/RevisionModal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Define the sections of the PEEL structure
 type SectionType = "point" | "explanation" | "example" | "link";
@@ -29,7 +31,10 @@ const ReviseAnswer = () => {
     mockAnswer: PeelResponse 
   };
   
-  // State for section navigation
+  // State for mode (view or practice)
+  const [mode, setMode] = useState<"view" | "practice">("view");
+  
+  // State for section navigation when in practice mode
   const [currentSection, setCurrentSection] = useState<SectionType>("point");
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [scoredWords, setScoredWords] = useState<Record<SectionType, ScoredWord[]>>({
@@ -38,6 +43,7 @@ const ReviseAnswer = () => {
     example: [],
     link: []
   });
+  const [showNextButton, setShowNextButton] = useState(false);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   
   const {
@@ -54,19 +60,30 @@ const ReviseAnswer = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleBackClick = () => {
-    navigate(-1);
+    if (mode === "practice") {
+      // Return to view mode
+      setMode("view");
+      resetRecording();
+      setCurrentSection("point");
+      setShowNextButton(false);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const handleStartPractice = () => {
+    setMode("practice");
+    setCurrentSection("point");
+    setShowNextButton(false);
   };
 
   const handleNextSection = () => {
     if (currentSection === "point") setCurrentSection("explanation");
     else if (currentSection === "explanation") setCurrentSection("example");
     else if (currentSection === "example") setCurrentSection("link");
-  };
-
-  const handlePreviousSection = () => {
-    if (currentSection === "explanation") setCurrentSection("point");
-    else if (currentSection === "example") setCurrentSection("explanation");
-    else if (currentSection === "link") setCurrentSection("example");
+    
+    resetRecording();
+    setShowNextButton(false);
   };
 
   const getSectionTitle = (section: SectionType): string => {
@@ -117,6 +134,7 @@ const ReviseAnswer = () => {
         }));
         
         setShowScoreModal(true);
+        setShowNextButton(true);
       } catch (error) {
         console.error("Error processing audio:", error);
         toast({
@@ -168,26 +186,134 @@ const ReviseAnswer = () => {
     return revisedContent;
   };
 
-  // Sidebar navigation for sections
-  const renderSectionNav = () => {
-    const sections: SectionType[] = ["point", "explanation", "example", "link"];
-    
+  // Render view mode (displaying the entire PEEL structure)
+  const renderViewMode = () => {
     return (
-      <div className="mb-6 flex flex-row justify-center gap-2">
-        {sections.map((section) => (
-          <Button
-            key={section}
-            variant={currentSection === section ? "default" : "outline"}
-            className={`flex flex-col items-center py-3 ${
-              currentSection === section 
-                ? `bg-${getSectionColor(section)}-600` 
-                : `border-${getSectionColor(section)}-200 text-${getSectionColor(section)}-700`
-            }`}
-            onClick={() => setCurrentSection(section)}
+      <div className="space-y-6">
+        <Tabs defaultValue="point" className="w-full">
+          <TabsList className="grid grid-cols-4 mb-4">
+            {["point", "explanation", "example", "link"].map((section) => (
+              <TabsTrigger 
+                key={section} 
+                value={section}
+                className={`text-${getSectionColor(section as SectionType)}-600`}
+              >
+                {getSectionTitle(section as SectionType)}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          
+          {["point", "explanation", "example", "link"].map((section) => (
+            <TabsContent key={section} value={section} className="mt-0">
+              <div className={`border-l-4 border-${getSectionColor(section as SectionType)}-200 pl-4 py-3`}>
+                <h3 className={`font-medium text-${getSectionColor(section as SectionType)}-600 mb-2 flex items-center`}>
+                  <BookOpen className={`h-5 w-5 mr-2 text-${getSectionColor(section as SectionType)}-500`} />
+                  {getSectionTitle(section as SectionType)}
+                </h3>
+                <div className="text-lg leading-relaxed">
+                  {getSectionContent(section as SectionType)}
+                </div>
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+        
+        <div className="flex justify-center mt-8">
+          <Button 
+            onClick={handleStartPractice} 
+            className="bg-blue-600 hover:bg-blue-700 px-8"
+            size="lg"
           >
-            <span className="text-xs">{getSectionTitle(section)}</span>
+            <Play className="mr-2 h-5 w-5" /> Practice Reading
           </Button>
-        ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Render practice mode (section by section practice)
+  const renderPracticeMode = () => {
+    const isLastSection = currentSection === "link";
+
+    return (
+      <div className="space-y-6">
+        {/* Section navigation bar */}
+        <div className="mb-6 flex flex-row justify-center gap-2">
+          {["point", "explanation", "example", "link"].map((section) => (
+            <div
+              key={section}
+              className={`px-4 py-2 rounded-md ${
+                currentSection === section 
+                  ? `bg-${getSectionColor(section as SectionType)}-500 text-white` 
+                  : `bg-gray-100 text-${getSectionColor(section as SectionType)}-600`
+              }`}
+            >
+              {getSectionTitle(section as SectionType)}
+            </div>
+          ))}
+        </div>
+        
+        <div className={`border-l-4 border-${getSectionColor(currentSection)}-200 pl-4 py-3`}>
+          <h3 className={`font-medium text-${getSectionColor(currentSection)}-600 mb-2 flex items-center`}>
+            <BookOpen className={`h-5 w-5 mr-2 text-${getSectionColor(currentSection)}-500`} />
+            {getSectionTitle(currentSection)}
+          </h3>
+          <div className="text-lg leading-relaxed">
+            {renderScoredContent(currentSection)}
+          </div>
+        </div>
+        
+        <div className="flex justify-center mt-8 space-x-4">
+          {!isRecording && !audioUrl && (
+            <Button 
+              onClick={startRecording} 
+              className="bg-red-500 hover:bg-red-600"
+            >
+              <Mic className="mr-2 h-4 w-4" /> Record Reading
+            </Button>
+          )}
+          
+          {isRecording && (
+            <Button 
+              onClick={stopRecording} 
+              className="bg-red-600 hover:bg-red-700 animate-pulse"
+            >
+              <MicOff className="mr-2 h-4 w-4" /> Stop Recording
+            </Button>
+          )}
+          
+          {audioUrl && (
+            <div className="flex flex-col gap-3 w-full max-w-md">
+              <audio src={audioUrl} controls className="w-full" />
+              <div className="flex gap-3">
+                <Button 
+                  onClick={resetRecording} 
+                  variant="outline"
+                >
+                  Record Again
+                </Button>
+                <Button 
+                  onClick={processRecording}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? "Processing..." : "Submit Recording"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <div className="flex justify-end mt-4">
+          {showNextButton && (
+            <Button
+              onClick={handleNextSection}
+              disabled={currentSection === "link"}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {isLastSection ? "Complete" : "Next"} <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          )}
+        </div>
       </div>
     );
   };
@@ -199,7 +325,8 @@ const ReviseAnswer = () => {
         className="mb-4" 
         onClick={handleBackClick}
       >
-        <ArrowLeft className="mr-2 h-4 w-4" /> Back
+        <ArrowLeft className="mr-2 h-4 w-4" /> 
+        {mode === "practice" ? "Back to Full Answer" : "Back"}
       </Button>
       
       <div className="max-w-5xl mx-auto">
@@ -208,93 +335,22 @@ const ReviseAnswer = () => {
             <CardTitle className="text-xl font-bold">
               {question.text}
             </CardTitle>
-            <div className="mt-4">
-              {renderSectionNav()}
-            </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 gap-6">
-              <div className="space-y-4">
-                <div className={`border-l-4 border-${getSectionColor(currentSection)}-200 pl-3 py-2`}>
-                  <h3 className={`font-medium text-${getSectionColor(currentSection)}-600 mb-2 flex items-center`}>
-                    <BookOpen className={`h-5 w-5 mr-2 text-${getSectionColor(currentSection)}-500`} />
-                    {getSectionTitle(currentSection)}
-                  </h3>
-                  <div className="text-lg leading-relaxed">
-                    {renderScoredContent(currentSection)}
-                  </div>
-                </div>
-                
-                <div className="flex justify-between mt-6">
-                  <Button
-                    variant="outline"
-                    onClick={handlePreviousSection}
-                    disabled={currentSection === "point"}
-                  >
-                    <ArrowLeft className="h-4 w-4 mr-1" /> Previous
-                  </Button>
-                  
-                  <div className="flex gap-3">
-                    {!isRecording && !audioUrl && (
-                      <Button 
-                        onClick={startRecording} 
-                        className="bg-red-500 hover:bg-red-600"
-                      >
-                        <Mic className="mr-2 h-4 w-4" /> Record Reading
-                      </Button>
-                    )}
-                    
-                    {isRecording && (
-                      <Button 
-                        onClick={stopRecording} 
-                        className="bg-red-600 hover:bg-red-700 animate-pulse"
-                      >
-                        <MicOff className="mr-2 h-4 w-4" /> Stop Recording
-                      </Button>
-                    )}
-                    
-                    {audioUrl && (
-                      <div className="flex flex-col gap-3 w-full">
-                        <audio src={audioUrl} controls className="w-full" />
-                        <div className="flex gap-3">
-                          <Button 
-                            onClick={resetRecording} 
-                            variant="outline"
-                          >
-                            Record Again
-                          </Button>
-                          <Button 
-                            onClick={processRecording}
-                            disabled={isProcessing}
-                          >
-                            {isProcessing ? "Processing..." : "Submit Recording"}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <Button
-                    variant="outline"
-                    onClick={handleNextSection}
-                    disabled={currentSection === "link"}
-                  >
-                    Next <ArrowRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+            {mode === "view" ? renderViewMode() : renderPracticeMode()}
           </CardContent>
         </Card>
         
-        <Button 
-          onClick={() => setShowRevisionModal(true)} 
-          className="w-full mt-4"
-          disabled={Object.values(scoredWords).every(section => section.length === 0)}
-        >
-          <BookOpen className="mr-2 h-4 w-4" />
-          Practice Full Answer
-        </Button>
+        {mode === "practice" && (
+          <Button 
+            onClick={() => setShowRevisionModal(true)} 
+            className="w-full mt-4"
+            disabled={Object.values(scoredWords).every(section => section.length === 0)}
+          >
+            <BookOpen className="mr-2 h-4 w-4" />
+            Practice Full Answer
+          </Button>
+        )}
       </div>
       
       {/* Score Modal */}
@@ -332,7 +388,6 @@ const ReviseAnswer = () => {
             <AlertDialogAction 
               onClick={() => {
                 setShowScoreModal(false);
-                resetRecording();
               }}
             >
               Close
