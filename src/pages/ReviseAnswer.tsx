@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { Mic, MicOff, Play, ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
-import { PeelResponse, Question } from "@/lib/mockData";
+import { PeelResponse, Question, questions, getMockAnswer } from "@/lib/mockData";
 import { processAudioTranscription } from "@/lib/feedback";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, 
@@ -25,10 +25,32 @@ const ReviseAnswer = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { question, mockAnswer } = location.state as { 
-    question: Question, 
-    mockAnswer: PeelResponse 
-  };
+  
+  // Use a default question and answer if none is provided in location state
+  // This prevents the app from crashing when accessed directly via URL
+  const [question, setQuestion] = useState<Question | undefined>();
+  const [mockAnswer, setMockAnswer] = useState<PeelResponse | undefined>();
+  
+  useEffect(() => {
+    // If we have state from navigation, use it
+    if (location.state?.question && location.state?.mockAnswer) {
+      setQuestion(location.state.question);
+      setMockAnswer(location.state.mockAnswer);
+    } else {
+      // Otherwise, use a default question (first one from the list)
+      const defaultQuestion = questions[0];
+      const defaultAnswer = getMockAnswer(defaultQuestion.id);
+      setQuestion(defaultQuestion);
+      setMockAnswer(defaultAnswer);
+      
+      // Inform the user that we're using a default question
+      toast({
+        title: "No question selected",
+        description: "Using a default question for demonstration.",
+        duration: 5000,
+      });
+    }
+  }, [location.state, toast]);
   
   // State for mode (view or practice)
   const [mode, setMode] = useState<"view" | "practice">("view");
@@ -85,6 +107,20 @@ const ReviseAnswer = () => {
     setShowNextButton(false);
   };
 
+  // If the question or mock answer is not yet loaded, show loading state
+  if (!question || !mockAnswer) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 p-6 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6 text-center">
+            <p className="text-lg">Loading question...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Continue with the rest of the component as before
   const getSectionTitle = (section: SectionType): string => {
     switch (section) {
       case "point": return "Point";
