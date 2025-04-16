@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -224,43 +225,44 @@ const ReviseAnswer = () => {
   const renderViewMode = () => {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col space-y-6">
-          <div className={`border-l-4 border-blue-200 pl-4 py-3`}>
-            <h3 className="font-medium text-blue-600 mb-2 flex items-center">
-              <BookOpen className="h-5 w-5 mr-2 text-blue-500" />
-              Point
-            </h3>
-            <div className="text-lg leading-relaxed">
+        {/* Table-like layout with headers on the left */}
+        <div className="space-y-1">
+          {/* Point Section */}
+          <div className="flex border-b border-gray-200">
+            <div className="w-1/4 py-4 px-4 font-semibold bg-blue-50 border-r border-gray-200 flex items-center">
+              <span className="text-blue-700">Point</span>
+            </div>
+            <div className="w-3/4 p-4 text-lg">
               {mockAnswer.point}
             </div>
           </div>
-
-          <div className={`border-l-4 border-green-200 pl-4 py-3`}>
-            <h3 className="font-medium text-green-600 mb-2 flex items-center">
-              <BookOpen className="h-5 w-5 mr-2 text-green-500" />
-              Explanation
-            </h3>
-            <div className="text-lg leading-relaxed">
+          
+          {/* Explanation Section */}
+          <div className="flex border-b border-gray-200">
+            <div className="w-1/4 py-4 px-4 font-semibold bg-green-50 border-r border-gray-200 flex items-center">
+              <span className="text-green-700">Explanation</span>
+            </div>
+            <div className="w-3/4 p-4 text-lg">
               {mockAnswer.explanation}
             </div>
           </div>
-
-          <div className={`border-l-4 border-orange-200 pl-4 py-3`}>
-            <h3 className="font-medium text-orange-600 mb-2 flex items-center">
-              <BookOpen className="h-5 w-5 mr-2 text-orange-500" />
-              Example
-            </h3>
-            <div className="text-lg leading-relaxed">
+          
+          {/* Example Section */}
+          <div className="flex border-b border-gray-200">
+            <div className="w-1/4 py-4 px-4 font-semibold bg-orange-50 border-r border-gray-200 flex items-center">
+              <span className="text-orange-700">Example</span>
+            </div>
+            <div className="w-3/4 p-4 text-lg">
               {mockAnswer.example}
             </div>
           </div>
-
-          <div className={`border-l-4 border-purple-200 pl-4 py-3`}>
-            <h3 className="font-medium text-purple-600 mb-2 flex items-center">
-              <BookOpen className="h-5 w-5 mr-2 text-purple-500" />
-              Link
-            </h3>
-            <div className="text-lg leading-relaxed">
+          
+          {/* Link Section */}
+          <div className="flex border-b border-gray-200">
+            <div className="w-1/4 py-4 px-4 font-semibold bg-purple-50 border-r border-gray-200 flex items-center">
+              <span className="text-purple-700">Link</span>
+            </div>
+            <div className="w-3/4 p-4 text-lg">
               {mockAnswer.link}
             </div>
           </div>
@@ -300,12 +302,14 @@ const ReviseAnswer = () => {
           ))}
         </div>
         
-        <div className={`border-l-4 border-${getSectionColor(currentSection)}-200 pl-4 py-3`}>
-          <h3 className={`font-medium text-${getSectionColor(currentSection)}-600 mb-2 flex items-center`}>
-            <BookOpen className={`h-5 w-5 mr-2 text-${getSectionColor(currentSection)}-500`} />
-            {getSectionTitle(currentSection)}
-          </h3>
-          <div className="text-lg leading-relaxed">
+        {/* Table-like layout for practice mode */}
+        <div className="flex border border-gray-200">
+          <div className={`w-1/4 py-4 px-4 font-semibold bg-${getSectionColor(currentSection)}-50 border-r border-gray-200 flex items-center`}>
+            <span className={`text-${getSectionColor(currentSection)}-700`}>
+              {getSectionTitle(currentSection)}
+            </span>
+          </div>
+          <div className="w-3/4 p-4 text-lg">
             {renderScoredContent(currentSection)}
           </div>
         </div>
