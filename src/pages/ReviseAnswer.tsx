@@ -188,7 +188,7 @@ const ReviseAnswer = () => {
   const renderViewMode = () => {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-col space-y-6">
           <div className={`border-l-4 border-blue-200 pl-4 py-3`}>
             <h3 className="font-medium text-blue-600 mb-2 flex items-center">
               <BookOpen className="h-5 w-5 mr-2 text-blue-500" />
