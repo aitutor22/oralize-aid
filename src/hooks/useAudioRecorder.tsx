@@ -23,6 +23,7 @@ export function useAudioRecorder() {
   const chunks = useRef<Blob[]>([]);
   const timerInterval = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const startTimer = useCallback(() => {
     if (timerInterval.current) {
@@ -101,6 +102,17 @@ export function useAudioRecorder() {
     }
   }, [recorderState.isRecording, recorderState.mediaRecorder, stopTimer]);
 
+  const playAudio = useCallback(() => {
+    if (recorderState.audioUrl) {
+      if (!audioRef.current) {
+        audioRef.current = new Audio(recorderState.audioUrl);
+      } else {
+        audioRef.current.src = recorderState.audioUrl;
+      }
+      audioRef.current.play();
+    }
+  }, [recorderState.audioUrl]);
+
   const resetRecording = useCallback(() => {
     stopTimer();
     
@@ -155,5 +167,6 @@ export function useAudioRecorder() {
     startRecording,
     stopRecording,
     resetRecording,
+    playAudio,
   };
 }

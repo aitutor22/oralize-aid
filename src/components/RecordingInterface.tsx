@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff } from "lucide-react";
+import { Mic, MicOff, Play } from "lucide-react";
 
 interface RecordingInterfaceProps {
   isRecording: boolean;
@@ -44,7 +44,20 @@ const RecordingInterface: React.FC<RecordingInterfaceProps> = ({
       
       {audioUrl && (
         <div className="flex flex-col gap-3 w-full max-w-md">
-          <audio src={audioUrl} controls className="w-full" />
+          <div className="flex gap-3 w-full">
+            <audio src={audioUrl} controls className="flex-grow" />
+            <Button 
+              onClick={() => {
+                const audioElement = document.querySelector('audio');
+                if (audioElement) {
+                  audioElement.play();
+                }
+              }} 
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Play className="mr-2 h-4 w-4" /> Play Audio
+            </Button>
+          </div>
           <div className="flex gap-3">
             <Button 
               onClick={resetRecording} 
