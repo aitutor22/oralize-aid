@@ -1,26 +1,20 @@
-
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
-import { Mic, MicOff, Play, ArrowLeft, ArrowRight, BookOpen, Volume } from "lucide-react";
+import { ArrowLeft, Play, BookOpen } from "lucide-react";
 import { PeelResponse, Question, questions, getMockAnswer } from "@/lib/mockData";
 import { processAudioTranscription } from "@/lib/feedback";
 import { useToast } from "@/hooks/use-toast";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, 
-  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import RevisionModal from "@/components/RevisionModal";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-// Define the sections of the PEEL structure
-type SectionType = "point" | "explanation" | "example" | "link";
-
-// Interface for scored word
-interface ScoredWord {
-  word: string;
-  score: "good" | "fair" | "poor";
-}
+import { SectionType, ScoredWord } from "@/types/peel";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
+import PeelSectionView from "@/components/PeelSectionView";
+import PeelSectionPractice from "@/components/PeelSectionPractice";
+import SectionNavigation from "@/components/SectionNavigation";
+import RecordingInterface from "@/components/RecordingInterface";
+import ScoreModal from "@/components/ScoreModal";
 
 const ReviseAnswer = () => {
   const location = useLocation();
@@ -28,7 +22,6 @@ const ReviseAnswer = () => {
   const { toast } = useToast();
   
   // Use a default question and answer if none is provided in location state
-  // This prevents the app from crashing when accessed directly via URL
   const [question, setQuestion] = useState<Question | undefined>();
   const [mockAnswer, setMockAnswer] = useState<PeelResponse | undefined>();
   
@@ -68,10 +61,6 @@ const ReviseAnswer = () => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   
-  // State for text-to-speech
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [currentSpeakingSection, setCurrentSpeakingSection] = useState<SectionType | null>(null);
-  
   const {
     isRecording,
     recordingTime,
@@ -84,6 +73,29 @@ const ReviseAnswer = () => {
   } = useAudioRecorder();
   
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const getSectionContent = (section: SectionType): string => {
+    if (!mockAnswer) return "";
+    
+    switch (section) {
+      case "point": return mockAnswer.point;
+      case "explanation": return mockAnswer.explanation;
+      case "example": return mockAnswer.example;
+      case "link": return mockAnswer.link;
+    }
+  };
+
+  const getSectionTitle = (section: SectionType): string => {
+    switch (section) {
+      case "point": return "Point";
+      case "explanation": return "Explanation";
+      case "example": return "Example";
+      case "link": return "Link";
+    }
+  };
+
+  // Text-to-speech hook
+  const { isSpeaking, currentSpeakingSection, readAloudSection, stopSpeaking } = useTextToSpeech({ getSectionContent });
 
   const handleBackClick = () => {
     if (mode === "practice") {
@@ -110,90 +122,6 @@ const ReviseAnswer = () => {
     
     resetRecording();
     setShowNextButton(false);
-  };
-
-  // Text-to-speech functionality using the Web Speech API
-  const readAloudSection = (section: SectionType) => {
-    // Cancel any ongoing speech
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-    
-    const text = getSectionContent(section);
-    
-    if ('speechSynthesis' in window && text) {
-      setCurrentSpeakingSection(section);
-      setIsSpeaking(true);
-      
-      const utterance = new SpeechSynthesisUtterance(text);
-      
-      utterance.onend = () => {
-        setIsSpeaking(false);
-        setCurrentSpeakingSection(null);
-      };
-      
-      utterance.onerror = () => {
-        setIsSpeaking(false);
-        setCurrentSpeakingSection(null);
-        toast({
-          title: "Speech Error",
-          description: "There was an error with the text-to-speech functionality.",
-          variant: "destructive",
-        });
-      };
-      
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-  
-  // Stop current speech
-  const stopSpeaking = () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-      setCurrentSpeakingSection(null);
-    }
-  };
-
-  // If the question or mock answer is not yet loaded, show loading state
-  if (!question || !mockAnswer) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 p-6 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6 text-center">
-            <p className="text-lg">Loading question...</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Continue with the rest of the component as before
-  const getSectionTitle = (section: SectionType): string => {
-    switch (section) {
-      case "point": return "Point";
-      case "explanation": return "Explanation";
-      case "example": return "Example";
-      case "link": return "Link";
-    }
-  };
-
-  const getSectionContent = (section: SectionType): string => {
-    switch (section) {
-      case "point": return mockAnswer.point;
-      case "explanation": return mockAnswer.explanation;
-      case "example": return mockAnswer.example;
-      case "link": return mockAnswer.link;
-    }
-  };
-
-  const getSectionColor = (section: SectionType): string => {
-    switch (section) {
-      case "point": return "blue";
-      case "explanation": return "green";
-      case "example": return "orange";
-      case "link": return "purple";
-    }
   };
 
   const processRecording = async () => {
@@ -231,34 +159,6 @@ const ReviseAnswer = () => {
     }
   };
 
-  const getScoreColor = (score: "good" | "fair" | "poor"): string => {
-    switch (score) {
-      case "good": return "text-green-600";
-      case "fair": return "text-orange-500";
-      case "poor": return "text-red-500";
-    }
-  };
-
-  const renderScoredContent = (section: SectionType) => {
-    const sectionWords = scoredWords[section];
-    if (!sectionWords || sectionWords.length === 0) {
-      return getSectionContent(section);
-    }
-
-    return (
-      <div>
-        {sectionWords.map((scoredWord, index) => (
-          <span 
-            key={index} 
-            className={`${getScoreColor(scoredWord.score)} inline-block mr-1`}
-          >
-            {scoredWord.word}
-          </span>
-        ))}
-      </div>
-    );
-  };
-
   const renderRevisedAnswer = () => {
     const allSections = ["point", "explanation", "example", "link"] as SectionType[];
     const revisedContent = allSections.map(section => {
@@ -269,234 +169,18 @@ const ReviseAnswer = () => {
     return revisedContent;
   };
 
-  const renderViewMode = () => {
+  // If the question or mock answer is not yet loaded, show loading state
+  if (!question || !mockAnswer) {
     return (
-      <div className="space-y-6">
-        {/* Table-like layout with headers on the left */}
-        <div className="space-y-1">
-          {/* Point Section */}
-          <div className="flex border-b border-gray-200">
-            <div className="w-1/4 py-4 px-4 font-semibold bg-blue-50 border-r border-gray-200 flex items-center">
-              <span className="text-blue-700">Point</span>
-            </div>
-            <div className="w-3/4 p-4 text-lg">
-              <div className="flex justify-between items-start">
-                <div>{mockAnswer.point}</div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="ml-2 flex-shrink-0"
-                  onClick={() => readAloudSection("point")}
-                  disabled={isSpeaking}
-                >
-                  <Volume className={`h-4 w-4 ${currentSpeakingSection === "point" ? "text-blue-500" : ""}`} />
-                  <span className="sr-only">Read aloud</span>
-                </Button>
-              </div>
-            </div>
-          </div>
-          
-          {/* Explanation Section */}
-          <div className="flex border-b border-gray-200">
-            <div className="w-1/4 py-4 px-4 font-semibold bg-green-50 border-r border-gray-200 flex items-center">
-              <span className="text-green-700">Explanation</span>
-            </div>
-            <div className="w-3/4 p-4 text-lg">
-              <div className="flex justify-between items-start">
-                <div>{mockAnswer.explanation}</div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="ml-2 flex-shrink-0"
-                  onClick={() => readAloudSection("explanation")}
-                  disabled={isSpeaking}
-                >
-                  <Volume className={`h-4 w-4 ${currentSpeakingSection === "explanation" ? "text-green-500" : ""}`} />
-                  <span className="sr-only">Read aloud</span>
-                </Button>
-              </div>
-            </div>
-          </div>
-          
-          {/* Example Section */}
-          <div className="flex border-b border-gray-200">
-            <div className="w-1/4 py-4 px-4 font-semibold bg-orange-50 border-r border-gray-200 flex items-center">
-              <span className="text-orange-700">Example</span>
-            </div>
-            <div className="w-3/4 p-4 text-lg">
-              <div className="flex justify-between items-start">
-                <div>{mockAnswer.example}</div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="ml-2 flex-shrink-0"
-                  onClick={() => readAloudSection("example")}
-                  disabled={isSpeaking}
-                >
-                  <Volume className={`h-4 w-4 ${currentSpeakingSection === "example" ? "text-orange-500" : ""}`} />
-                  <span className="sr-only">Read aloud</span>
-                </Button>
-              </div>
-            </div>
-          </div>
-          
-          {/* Link Section */}
-          <div className="flex border-b border-gray-200">
-            <div className="w-1/4 py-4 px-4 font-semibold bg-purple-50 border-r border-gray-200 flex items-center">
-              <span className="text-purple-700">Link</span>
-            </div>
-            <div className="w-3/4 p-4 text-lg">
-              <div className="flex justify-between items-start">
-                <div>{mockAnswer.link}</div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="ml-2 flex-shrink-0"
-                  onClick={() => readAloudSection("link")}
-                  disabled={isSpeaking}
-                >
-                  <Volume className={`h-4 w-4 ${currentSpeakingSection === "link" ? "text-purple-500" : ""}`} />
-                  <span className="sr-only">Read aloud</span>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {isSpeaking && (
-          <div className="flex justify-center">
-            <Button 
-              onClick={stopSpeaking}
-              variant="outline"
-              className="mt-2"
-            >
-              Stop Reading
-            </Button>
-          </div>
-        )}
-        
-        <div className="flex justify-center mt-8">
-          <Button 
-            onClick={handleStartPractice} 
-            className="bg-blue-600 hover:bg-blue-700 px-8"
-            size="lg"
-          >
-            <Play className="mr-2 h-5 w-5" /> Practice Reading
-          </Button>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 p-6 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6 text-center">
+            <p className="text-lg">Loading question...</p>
+          </CardContent>
+        </Card>
       </div>
     );
-  };
-
-  const renderPracticeMode = () => {
-    const isLastSection = currentSection === "link";
-
-    return (
-      <div className="space-y-6">
-        {/* Section navigation bar */}
-        <div className="mb-6 flex flex-row justify-center gap-2">
-          {["point", "explanation", "example", "link"].map((section) => (
-            <div
-              key={section}
-              className={`px-4 py-2 rounded-md ${
-                currentSection === section 
-                  ? `bg-${getSectionColor(section as SectionType)}-500 text-white` 
-                  : `bg-gray-100 text-${getSectionColor(section as SectionType)}-600`
-              }`}
-            >
-              {getSectionTitle(section as SectionType)}
-            </div>
-          ))}
-        </div>
-        
-        {/* Table-like layout for practice mode */}
-        <div className="flex border border-gray-200">
-          <div className={`w-1/4 py-4 px-4 font-semibold bg-${getSectionColor(currentSection)}-50 border-r border-gray-200 flex items-center justify-between`}>
-            <span className={`text-${getSectionColor(currentSection)}-700`}>
-              {getSectionTitle(currentSection)}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => readAloudSection(currentSection)}
-              disabled={isSpeaking}
-              className="ml-2"
-            >
-              <Volume className={`h-4 w-4 ${isSpeaking ? `text-${getSectionColor(currentSection)}-500` : ""}`} />
-              <span className="sr-only">Read aloud</span>
-            </Button>
-          </div>
-          <div className="w-3/4 p-4 text-lg">
-            {renderScoredContent(currentSection)}
-          </div>
-        </div>
-        
-        {isSpeaking && (
-          <div className="flex justify-center">
-            <Button 
-              onClick={stopSpeaking}
-              variant="outline"
-              className="mt-2"
-            >
-              Stop Reading
-            </Button>
-          </div>
-        )}
-        
-        <div className="flex justify-center mt-8 space-x-4">
-          {!isRecording && !audioUrl && (
-            <Button 
-              onClick={startRecording} 
-              className="bg-red-500 hover:bg-red-600"
-            >
-              <Mic className="mr-2 h-4 w-4" /> Record Reading
-            </Button>
-          )}
-          
-          {isRecording && (
-            <Button 
-              onClick={stopRecording} 
-              className="bg-red-600 hover:bg-red-700 animate-pulse"
-            >
-              <MicOff className="mr-2 h-4 w-4" /> Stop Recording
-            </Button>
-          )}
-          
-          {audioUrl && (
-            <div className="flex flex-col gap-3 w-full max-w-md">
-              <audio src={audioUrl} controls className="w-full" />
-              <div className="flex gap-3">
-                <Button 
-                  onClick={resetRecording} 
-                  variant="outline"
-                >
-                  Record Again
-                </Button>
-                <Button 
-                  onClick={processRecording}
-                  disabled={isProcessing}
-                >
-                  {isProcessing ? "Processing..." : "Submit Recording"}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-        
-        <div className="flex justify-end mt-4">
-          {showNextButton && (
-            <Button
-              onClick={handleNextSection}
-              disabled={currentSection === "link"}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {isLastSection ? "Complete" : "Next"} <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          )}
-        </div>
-      </div>
-    );
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 p-6">
@@ -517,7 +201,84 @@ const ReviseAnswer = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {mode === "view" ? renderViewMode() : renderPracticeMode()}
+            {mode === "view" ? (
+              <div className="space-y-6">
+                <PeelSectionView
+                  mockAnswer={mockAnswer}
+                  currentSpeakingSection={currentSpeakingSection}
+                  isSpeaking={isSpeaking}
+                  onReadAloud={readAloudSection}
+                />
+                
+                {isSpeaking && (
+                  <div className="flex justify-center">
+                    <Button 
+                      onClick={stopSpeaking}
+                      variant="outline"
+                      className="mt-2"
+                    >
+                      Stop Reading
+                    </Button>
+                  </div>
+                )}
+                
+                <div className="flex justify-center mt-8">
+                  <Button 
+                    onClick={handleStartPractice} 
+                    className="bg-blue-600 hover:bg-blue-700 px-8"
+                    size="lg"
+                  >
+                    <Play className="mr-2 h-5 w-5" /> Practice Reading
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <SectionNavigation currentSection={currentSection} />
+                
+                <PeelSectionPractice
+                  currentSection={currentSection}
+                  sectionContent={getSectionContent(currentSection)}
+                  scoredWords={scoredWords[currentSection]}
+                  isSpeaking={isSpeaking}
+                  onReadAloud={() => readAloudSection(currentSection)}
+                />
+                
+                {isSpeaking && (
+                  <div className="flex justify-center">
+                    <Button 
+                      onClick={stopSpeaking}
+                      variant="outline"
+                      className="mt-2"
+                    >
+                      Stop Reading
+                    </Button>
+                  </div>
+                )}
+                
+                <RecordingInterface
+                  isRecording={isRecording}
+                  audioUrl={audioUrl}
+                  isProcessing={isProcessing}
+                  startRecording={startRecording}
+                  stopRecording={stopRecording}
+                  resetRecording={resetRecording}
+                  processRecording={processRecording}
+                />
+                
+                <div className="flex justify-end mt-4">
+                  {showNextButton && (
+                    <Button
+                      onClick={handleNextSection}
+                      disabled={currentSection === "link"}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      {currentSection === "link" ? "Complete" : "Next"} <ArrowLeft className="h-4 w-4 ml-1" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
         
@@ -534,47 +295,13 @@ const ReviseAnswer = () => {
       </div>
       
       {/* Score Modal */}
-      <AlertDialog open={showScoreModal} onOpenChange={setShowScoreModal}>
-        <AlertDialogContent className="sm:max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Reading Score</AlertDialogTitle>
-            <AlertDialogDescription>
-              Here's how you did on reading the {getSectionTitle(currentSection)}.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          
-          <div className="py-4">
-            <div className="bg-white/70 p-4 rounded-lg border border-gray-200 text-neutral-800 leading-relaxed">
-              {renderScoredContent(currentSection)}
-            </div>
-            
-            <div className="mt-4 grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-green-600 font-bold text-lg">Good</div>
-                <div className="text-sm text-gray-600">Words pronounced well</div>
-              </div>
-              <div>
-                <div className="text-orange-500 font-bold text-lg">Fair</div>
-                <div className="text-sm text-gray-600">Words to improve</div>
-              </div>
-              <div>
-                <div className="text-red-500 font-bold text-lg">Poor</div>
-                <div className="text-sm text-gray-600">Words to practice</div>
-              </div>
-            </div>
-          </div>
-          
-          <AlertDialogFooter>
-            <AlertDialogAction 
-              onClick={() => {
-                setShowScoreModal(false);
-              }}
-            >
-              Close
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ScoreModal
+        isOpen={showScoreModal}
+        onClose={() => setShowScoreModal(false)}
+        currentSection={currentSection}
+        sectionTitle={getSectionTitle(currentSection)}
+        scoredWords={scoredWords[currentSection]}
+      />
       
       {/* Revision Modal */}
       <RevisionModal 
