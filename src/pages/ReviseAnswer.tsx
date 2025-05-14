@@ -4,7 +4,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
-import { Mic, MicOff, Play, ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
+import { Mic, MicOff, Play, ArrowLeft, ArrowRight, BookOpen, Volume } from "lucide-react";
 import { PeelResponse, Question, questions, getMockAnswer } from "@/lib/mockData";
 import { processAudioTranscription } from "@/lib/feedback";
 import { useToast } from "@/hooks/use-toast";
@@ -68,6 +68,10 @@ const ReviseAnswer = () => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   
+  // State for text-to-speech
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [currentSpeakingSection, setCurrentSpeakingSection] = useState<SectionType | null>(null);
+  
   const {
     isRecording,
     recordingTime,
@@ -106,6 +110,49 @@ const ReviseAnswer = () => {
     
     resetRecording();
     setShowNextButton(false);
+  };
+
+  // Text-to-speech functionality using the Web Speech API
+  const readAloudSection = (section: SectionType) => {
+    // Cancel any ongoing speech
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    
+    const text = getSectionContent(section);
+    
+    if ('speechSynthesis' in window && text) {
+      setCurrentSpeakingSection(section);
+      setIsSpeaking(true);
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        setCurrentSpeakingSection(null);
+      };
+      
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        setCurrentSpeakingSection(null);
+        toast({
+          title: "Speech Error",
+          description: "There was an error with the text-to-speech functionality.",
+          variant: "destructive",
+        });
+      };
+      
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+  
+  // Stop current speech
+  const stopSpeaking = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setCurrentSpeakingSection(null);
+    }
   };
 
   // If the question or mock answer is not yet loaded, show loading state
@@ -233,7 +280,19 @@ const ReviseAnswer = () => {
               <span className="text-blue-700">Point</span>
             </div>
             <div className="w-3/4 p-4 text-lg">
-              {mockAnswer.point}
+              <div className="flex justify-between items-start">
+                <div>{mockAnswer.point}</div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-2 flex-shrink-0"
+                  onClick={() => readAloudSection("point")}
+                  disabled={isSpeaking}
+                >
+                  <Volume className={`h-4 w-4 ${currentSpeakingSection === "point" ? "text-blue-500" : ""}`} />
+                  <span className="sr-only">Read aloud</span>
+                </Button>
+              </div>
             </div>
           </div>
           
@@ -243,7 +302,19 @@ const ReviseAnswer = () => {
               <span className="text-green-700">Explanation</span>
             </div>
             <div className="w-3/4 p-4 text-lg">
-              {mockAnswer.explanation}
+              <div className="flex justify-between items-start">
+                <div>{mockAnswer.explanation}</div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-2 flex-shrink-0"
+                  onClick={() => readAloudSection("explanation")}
+                  disabled={isSpeaking}
+                >
+                  <Volume className={`h-4 w-4 ${currentSpeakingSection === "explanation" ? "text-green-500" : ""}`} />
+                  <span className="sr-only">Read aloud</span>
+                </Button>
+              </div>
             </div>
           </div>
           
@@ -253,7 +324,19 @@ const ReviseAnswer = () => {
               <span className="text-orange-700">Example</span>
             </div>
             <div className="w-3/4 p-4 text-lg">
-              {mockAnswer.example}
+              <div className="flex justify-between items-start">
+                <div>{mockAnswer.example}</div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-2 flex-shrink-0"
+                  onClick={() => readAloudSection("example")}
+                  disabled={isSpeaking}
+                >
+                  <Volume className={`h-4 w-4 ${currentSpeakingSection === "example" ? "text-orange-500" : ""}`} />
+                  <span className="sr-only">Read aloud</span>
+                </Button>
+              </div>
             </div>
           </div>
           
@@ -263,10 +346,34 @@ const ReviseAnswer = () => {
               <span className="text-purple-700">Link</span>
             </div>
             <div className="w-3/4 p-4 text-lg">
-              {mockAnswer.link}
+              <div className="flex justify-between items-start">
+                <div>{mockAnswer.link}</div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-2 flex-shrink-0"
+                  onClick={() => readAloudSection("link")}
+                  disabled={isSpeaking}
+                >
+                  <Volume className={`h-4 w-4 ${currentSpeakingSection === "link" ? "text-purple-500" : ""}`} />
+                  <span className="sr-only">Read aloud</span>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
+        
+        {isSpeaking && (
+          <div className="flex justify-center">
+            <Button 
+              onClick={stopSpeaking}
+              variant="outline"
+              className="mt-2"
+            >
+              Stop Reading
+            </Button>
+          </div>
+        )}
         
         <div className="flex justify-center mt-8">
           <Button 
@@ -304,15 +411,37 @@ const ReviseAnswer = () => {
         
         {/* Table-like layout for practice mode */}
         <div className="flex border border-gray-200">
-          <div className={`w-1/4 py-4 px-4 font-semibold bg-${getSectionColor(currentSection)}-50 border-r border-gray-200 flex items-center`}>
+          <div className={`w-1/4 py-4 px-4 font-semibold bg-${getSectionColor(currentSection)}-50 border-r border-gray-200 flex items-center justify-between`}>
             <span className={`text-${getSectionColor(currentSection)}-700`}>
               {getSectionTitle(currentSection)}
             </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => readAloudSection(currentSection)}
+              disabled={isSpeaking}
+              className="ml-2"
+            >
+              <Volume className={`h-4 w-4 ${isSpeaking ? `text-${getSectionColor(currentSection)}-500` : ""}`} />
+              <span className="sr-only">Read aloud</span>
+            </Button>
           </div>
           <div className="w-3/4 p-4 text-lg">
             {renderScoredContent(currentSection)}
           </div>
         </div>
+        
+        {isSpeaking && (
+          <div className="flex justify-center">
+            <Button 
+              onClick={stopSpeaking}
+              variant="outline"
+              className="mt-2"
+            >
+              Stop Reading
+            </Button>
+          </div>
+        )}
         
         <div className="flex justify-center mt-8 space-x-4">
           {!isRecording && !audioUrl && (
